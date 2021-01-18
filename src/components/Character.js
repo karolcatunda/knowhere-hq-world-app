@@ -1,53 +1,74 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
-import _ from 'lodash'
-import Footer from './Footer'
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import _ from 'lodash';
+import Footer from './Footer';
+import { LOADING_REQUEST_MSG, DEFAULT_ERROR_MSG } from '../helpers/consts';
 
+/**
+ * Character component aims to render found items of /characters request
+ * by showing the character thumbnail and name. Also renders a Footer for 
+ * all characters.
+ * 
+ * @param {String} requestParams An object containing the parameters requested by Marvel API 
+ */
 export default function Character(props) {
-  const requestParams = props?.requestParams
-  const [characterList, setCharacterList] = useState([])
-  const [totalItems, setTotalItems] = useState(0)
-  const [searchText, setSearchText] = useState('')
-  const [pendingRequest, setPendingRequest] = useState(false)
-  const [query, setQuery] = useState('')
-  const [offset, setOffset] = useState(0)
-  const [footerFirstNumber, setFooterFirstNumber] = useState(0)
-  const [footerLastNumber, setFooterLastNumber] = useState(20)
+  const requestParams = props?.requestParams;
+  const [characterList, setCharacterList] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [searchText, setSearchText] = useState('');
+  const [pendingRequest, setPendingRequest] = useState(false);
+  const [query, setQuery] = useState('');
+  const [offset, setOffset] = useState(0);
+  const [footerFirstNumber, setFooterFirstNumber] = useState(0);
+  const [footerLastNumber, setFooterLastNumber] = useState(20);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const jarvisText = pendingRequest ? LOADING_REQUEST_MSG : '';
+  const placeholderText = 'Ex. Iron Man, Wolverine, Charles Xavier...';
+  const buttonText = 'Jarvis, pesquisar meu personagem!';
 
   useEffect(() => {
-    setPendingRequest(true)
+    setPendingRequest(true);
     axios(`http://gateway.marvel.com/v1/public/characters?offset=${offset}${query}`, requestParams)
     .then(response => {
-      setCharacterList(response?.data?.data?.results)
-      setTotalItems(response?.data?.data?.total)
+      setCharacterList(response?.data?.data?.results);
+      setTotalItems(response?.data?.data?.total);
     })
-    .catch(error => {
-      console.log('errortttt: ', error)
+    .catch(() => {
+      setErrorMsg(DEFAULT_ERROR_MSG);
     })
     .finally(() => {
-      setPendingRequest(false)
+      setPendingRequest(false);
     })
-  }, [offset, query, requestParams])
+  }, [offset, query, requestParams]);
 
   function updateItems(offset, first, last) {
-    setOffset(offset)
-    setFooterFirstNumber(first)
-    setFooterLastNumber(last)
+    setOffset(offset);
+    setFooterFirstNumber(first);
+    setFooterLastNumber(last);
   }
-
-  const jarvisText = pendingRequest ? 'Aguarde enquanto Jarvis busca os resultados...' : ''
 
   return(
     <>
       <div>
-        <input className='character-input' type="text" value={searchText} placeholder='Ex. Iron Man, Wolverine, Charles Xavier...' size='40' onChange={event => setSearchText(event.target.value)} />
+        { errorMsg &&
+            <span>{errorMsg}</span>
+        }
+        <input
+          className='character-input'
+          type='text'
+          value={searchText}
+          placeholder={placeholderText}
+          size='40'
+          onChange={event => setSearchText(event.target.value)}
+        />
         <button onClick={() => {
           setOffset(0)
           setQuery(_.isEmpty(searchText) ? '' : `&name=${searchText}`)
         }
           
         }>
-          Jarvis, pesquisar meu personagem!
+          {buttonText}
         </button>
       </div>
 
@@ -68,8 +89,13 @@ export default function Character(props) {
         }))
       }
       { !pendingRequest && !_.isEmpty(characterList) &&
-          <Footer totalItems={totalItems} updateOffset={updateItems} footerFirstSavedNumber={footerFirstNumber} footerLastSavedNumber={footerLastNumber} />
-        }
+          <Footer
+            totalItems={totalItems}
+            updateOffset={updateItems}
+            footerFirstSavedNumber={footerFirstNumber}
+            footerLastSavedNumber={footerLastNumber}
+          />
+      }
     </>
   )
 }
