@@ -4,6 +4,9 @@ import InitialPage from '../components/InitialPage';
 
 const CHARACTERS_PATH = '/characters';
 
+/**
+ * Routes configures the routes to be used and renders the component according with them
+ */
 export default function Routes() {
   return (
     <Switch>
