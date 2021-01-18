@@ -9,7 +9,7 @@ Para o desenvolvimento desta aplicação, Jarvis recomendou a versão do Node X 
 - src/helpers: arquivo contendo constantes compartilhadas entre vários arquivos
 - src/images: imagem(ns) utilizadas no Aplicativo
 - src/styles: arquivo .scss contendo todos os estilos utilizados na aplicação
-- 
+
 ## Execução da Aplicação:
 - Para executar a aplicação, Jarvis aconselha rodar os seguintes comandos:
 ```sh
